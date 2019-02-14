@@ -1,0 +1,17 @@
+{
+  "name": "codonn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "cody",
+  "license": "ISC",
+  "dependencies": {
+    "angular-ui-bootstrap": "^2.5.6",
+    "bootstrap": "^4.3.0",
+    "express": "^4.15.2",
+    "pm2": "^2.4.5"
+  }
+}
