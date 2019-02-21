@@ -5,18 +5,6 @@ var app = (function () {
 	 * Center point determined using bboxfinder.com
 	 *
 	 */
-	// mapboxgl.accessToken = 'pk.eyJ1IjoiY29kb25uZWxsIiwiYSI6ImNqbmNhaTlrNzBndDIzcHBvYnNla2RneHAifQ.OMGQ5aqcWXSsAKc8niEsEw';
-	// var map = new mapboxgl.Map({
-	// 	container: 'map',
-	// 	style: 'mapbox://styles/mapbox/streets-v11',
-	// 	center: [-84.348907,33.818527],
-	// 	zoom: 12
-	// });
-	const baseLayers = [
-		'atlanta-health-coverage',
-		'atlanta-health-private'
-	];
-
 	mapboxgl.accessToken = 'pk.eyJ1IjoiY29kb25uZWxsIiwiYSI6ImNqbmNhaTlrNzBndDIzcHBvYnNla2RneHAifQ.OMGQ5aqcWXSsAKc8niEsEw';
 	var map = new mapboxgl.Map({
 		container: 'map',
@@ -24,6 +12,10 @@ var app = (function () {
 		center: [-84.348907,33.818527],
 		zoom: 12.0
 	});
+	const baseLayers = [
+		'atlanta-health-coverage',
+		'atlanta-health-private'
+	];
 	var pathNumber = 0;
 	var pathsLookup = {};
 	var colors = ["#66c2a5","#e78ac3","#ffd92f","#e5c494","#b3b3b3","#8da0cb","#fc8d62","#a6d854"];
@@ -64,7 +56,30 @@ var app = (function () {
 				"line-width": 3
 			}
 		};
+		var point = {
+			"id": "point" + number,
+			"type": "circle",
+			"source": {
+				"type": "geojson",
+				"data": {
+					"type": "Feature",
+					"properties": {},
+					"geometry": {
+						"type": "Point",
+						"coordinates": geojson.features[0].geometry.coordinates[0]
+					}
+				}
+			},
+			"paint": {
+				"circle-radius": 7,
+				"circle-color": "#000",
+				"circle-opacity": 0.5,
+				"circle-stroke-color": "#aaa",
+				"circle-stroke-width": 2
+			}
+		};
 		map.addLayer(layer);
+		map.addLayer(point);
 
 		return pathsLookup;
 	}
@@ -119,6 +134,24 @@ var app = (function () {
 			d3.select('#' + key)
 				.text(data.properties.distance.toLocaleString() + " km");
 		};
+	}
+
+	function moveLocationPoints(selectedTime) {
+		for (key in pathsLookup) {
+			var path = pathsLookup[key];
+			var pathData = path.features[0];
+			var number = key.split("path")[1];
+			var data = {
+				"type": "Point",
+				"coordinates": []
+			};
+			var coordIndex = pathData.properties.coordTimes.findIndex(function(t) {
+				var coordTime = new Date(t);
+				return coordTime >= selectedTime;
+			});
+			data.coordinates = pathData.geometry.coordinates[coordIndex];
+			map.getSource('point' + number).setData(data);
+		}
 	}
 
 	/**
@@ -197,7 +230,9 @@ var app = (function () {
 			}
 			data.push({
 				date: new Date(coordTimes[i]),
-				distance: distance
+				distance: distance,
+				lat: c[1],
+				long: c[0]
 			});
 		});
 		lineChart.data.push(data);
@@ -229,6 +264,7 @@ var app = (function () {
 		colors: colors,
 		drawFilteredPath: drawFilteredPath,
 		upload: upload,
-		changeBaseLayer: changeBaseLayer
+		changeBaseLayer: changeBaseLayer,
+		moveLocationPoints: moveLocationPoints
 	}
 })();

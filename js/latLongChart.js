@@ -6,8 +6,8 @@ var lineChart = (function () {
 	var fullWidth = parseInt(container.style('width')) - parseInt(container.style('padding-right')) - parseInt(container.style('padding-left')),
 	    fullHeight = parseInt(container.style('height'));
 
-	var margin = {top: 10, right: 50, bottom: 130, left: 15},
-		marginMini = {top: 650, right: 50, bottom: 30, left: 15},
+	var margin = {top: 10, right: 50, bottom: 130, left: 25},
+		marginMini = {top: 650, right: 50, bottom: 30, left: 25},
 	    width = fullWidth - margin.left - margin.right,
 	    height = fullHeight - margin.top - margin.bottom,
 	    heightMini = fullHeight - marginMini.top - marginMini.bottom;
@@ -16,8 +16,8 @@ var lineChart = (function () {
 
 	var lineNumber = 0;
 
-	// parse the date / time
-	var parseTime = d3.timeParse("%d-%b-%y");
+	// format time as 
+	var formatTime = d3.timeFormat("%B %d %I:%M%p");
 
 	// set the main chart scales
 	var xScale = d3.scaleTime()
@@ -44,12 +44,12 @@ var lineChart = (function () {
 	// define the main line function
 	var line = d3.line()
 	    .x(function(d) { return xScale(d.date); })
-	    .y(function(d) { return yScale(d.distance); });
+	    .y(function(d) { return yScale(d.lat); });
 
 	// define the mini line function
 	var lineMini = d3.line()
 	    .x(function(d) { return xScaleMini(d.date); })
-	    .y(function(d) { return yScaleMini(d.distance); });
+	    .y(function(d) { return yScaleMini(d.lat); });
 
 	var brush = d3.brushX()
 	    .extent([[0, 0], [width, heightMini]])
@@ -105,21 +105,31 @@ var lineChart = (function () {
 	    .attr("transform", "translate(" + marginMini.left + "," + marginMini.top + ")");
 
 	mini.append("g")
-	      	.attr("class", "axis x")
-	      	.attr("transform", "translate(0," + heightMini + ")")
-	      	.call(xAxisMini);
+      	.attr("class", "axis x")
+      	.attr("transform", "translate(0," + heightMini + ")")
+      	.call(xAxisMini);
 
   	mini.append("g")
       	.attr("class", "brush")
       	.call(brush)
       	.call(brush.move, xScale.range());
 
-    svg.append("rect")
+    var mouseBox = svg.append("rect")
 		.attr("class", "zoom")
 		.attr("width", width)
 		.attr("height", height)
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+		.on('mousemove', drawTooltip)
+    	.on('mouseout', removeTooltip)
 		.call(zoom);
+
+	var tooltip = d3.select('#chart-tooltip');
+	
+	var tooltipLine = chart.append('line')
+		.attr('class', 'tooltip-line');	
+
+	var tooltipLineLabel = svg.append('text')
+		.attr('class', 'tooltip-line-label');		
 
 	function render() {
 		var mergedData = [];
@@ -129,9 +139,12 @@ var lineChart = (function () {
 		});
 
 		// Scale the range of the data
+		var minLat = d3.min(mergedData, function(d) { return d.lat; });
+		var maxLat = d3.max(mergedData, function(d) { return d.lat; });
 		xScale.domain(d3.extent(mergedData, function(d) { return d.date; }));
 		xScaleMini.domain(d3.extent(mergedData, function(d) { return d.date; }));
-		yScale.domain([0, d3.max(mergedData, function(d) { return d.distance; })]);
+		yScale.domain([minLat, maxLat]).nice();
+		yScaleMini.domain([minLat, maxLat]).nice();
 
 		focus.select('.x.axis')
 			.transition()
@@ -192,6 +205,46 @@ var lineChart = (function () {
 		focus.select(".axis.x").call(xAxis);
 		mini.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
 		app.drawFilteredPath();
+	}
+
+	function removeTooltip() {
+	  	if (tooltip) tooltip.style('display', 'none');
+	  	if (tooltipLine) tooltipLine.attr('stroke', 'none');
+	  	if (tooltipLineLabel) tooltipLineLabel.attr('opacity', 0);
+	}
+
+	function drawTooltip() {
+	  	const selectedTime = xScale.invert(d3.mouse(mouseBox.node())[0]);
+
+	  	const labelWidth = tooltipLineLabel.node().getBBox().width;
+	    
+	  	tooltipLine.attr('stroke', 'black')
+	    	.attr('x1', xScale(selectedTime))
+	    	.attr('x2', xScale(selectedTime))
+	    	.attr('y1', 0)
+	    	.attr('y2', height);
+
+	    tooltipLineLabel.attr('opacity', 1)
+	    	.attr('text-anchor', 'end')
+	    	.attr('x', function(d) {
+	    		if(xScale(selectedTime) + (labelWidth/2) + (margin.left*2) <= fullWidth
+	    			&& xScale(selectedTime) - (labelWidth/2) + margin.left >= 0) {
+	    			return xScale(selectedTime) + labelWidth/2 + margin.left;
+	    		} else if(xScale(selectedTime) + (labelWidth/2) + (margin.left*2) > fullWidth) {
+	    			return fullWidth - margin.left;
+	    		} else {
+	    			return labelWidth;
+	    		}
+	    	})
+	    	.attr('y', 5)
+	    	.text(formatTime(selectedTime));
+	  
+	  	tooltip.html(selectedTime)
+	    	.style('display', 'block')
+	    	.style('left', d3.event.pageX + 20)
+	    	.style('top', d3.event.pageY - 20);
+
+	    app.moveLocationPoints(selectedTime);
 	}
 
 	return {

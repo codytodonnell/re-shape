@@ -104,3 +104,9 @@
   fill: none;
   pointer-events: all;
 }
+
+.tooltip {
+	position: absolute;
+	background: #efefef;
+	border: 1px solid #ccc;
+}
