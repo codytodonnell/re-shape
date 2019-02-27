@@ -149,8 +149,10 @@ var app = (function () {
 				var coordTime = new Date(t);
 				return coordTime >= selectedTime;
 			});
-			data.coordinates = pathData.geometry.coordinates[coordIndex];
-			map.getSource('point' + number).setData(data);
+			if(coordIndex >= 0) {
+				data.coordinates = pathData.geometry.coordinates[coordIndex];
+				map.getSource('point' + number).setData(data);
+			}
 		}
 	}
 

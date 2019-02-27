@@ -41,15 +41,29 @@ var lineChart = (function () {
 		xAxisMini = d3.axisBottom(xScaleMini),
 		yAxis = d3.axisLeft(yScale);
 
+	var min = {
+		lat: 0,
+		long: 0,
+		distance: 0
+	};
+
+	var max = {
+		lat: 0,
+		long: 0,
+		distance: 0
+	};
+
+	var ySelector = d3.select("#y-select").node();
+
 	// define the main line function
 	var line = d3.line()
 	    .x(function(d) { return xScale(d.date); })
-	    .y(function(d) { return yScale(d.lat); });
+	    .y(function(d) { return yScale(d[ySelector.value]); });
 
 	// define the mini line function
 	var lineMini = d3.line()
 	    .x(function(d) { return xScaleMini(d.date); })
-	    .y(function(d) { return yScaleMini(d.lat); });
+	    .y(function(d) { return yScaleMini(d[ySelector.value]); });
 
 	var brush = d3.brushX()
 	    .extent([[0, 0], [width, heightMini]])
@@ -139,12 +153,18 @@ var lineChart = (function () {
 		});
 
 		// Scale the range of the data
-		var minLat = d3.min(mergedData, function(d) { return d.lat; });
-		var maxLat = d3.max(mergedData, function(d) { return d.lat; });
+		min.lat = d3.min(mergedData, function(d) { return d.lat; });
+		max.lat = d3.max(mergedData, function(d) { return d.lat; });
+		min.long = d3.min(mergedData, function(d) { return d.long; });
+		max.long = d3.max(mergedData, function(d) { return d.long; });
+		min.distance = d3.min(mergedData, function(d) { return d.distance; });
+		max.distance = d3.max(mergedData, function(d) { return d.distance; });
 		xScale.domain(d3.extent(mergedData, function(d) { return d.date; }));
 		xScaleMini.domain(d3.extent(mergedData, function(d) { return d.date; }));
-		yScale.domain([minLat, maxLat]).nice();
-		yScaleMini.domain([minLat, maxLat]).nice();
+		yScale.domain([min[ySelector.value], max[ySelector.value]]).nice();
+		yScaleMini.domain([min[ySelector.value], max[ySelector.value]]).nice();
+		line.y(function(d) { return yScale(d[ySelector.value]); });
+		lineMini.y(function(d) { return yScaleMini(d[ySelector.value]); });
 
 		focus.select('.x.axis')
 			.transition()
@@ -247,11 +267,38 @@ var lineChart = (function () {
 	    app.moveLocationPoints(selectedTime);
 	}
 
+	function changeYAxis(key) {
+		yScale.domain([min[key], max[key]]).nice();
+		yScaleMini.domain([min[key], max[key]]).nice();
+		line.y(function(d) { return yScale(d[key]); });
+		lineMini.y(function(d) { return yScaleMini(d[key]); });
+
+		focus.select('.y.axis')
+			.transition()
+			.call(yAxis);
+
+		mini.select('.x.axis')
+			.transition()
+			.call(xAxisMini);
+
+		d3.selectAll('.series path')
+			.transition()
+			.duration(750)
+			.attr("d", line);
+
+		d3.selectAll('.series-mini path')
+			.transition()
+			.duration(750)
+			.attr("d", lineMini);
+
+	}
+
 	return {
 		data: data,
 		xScale: xScale,
 		xScaleMini: xScaleMini,
 		yScale: yScale,
-		render: render
+		render: render,
+		changeYAxis: changeYAxis
 	}
 })();

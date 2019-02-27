@@ -3,7 +3,7 @@
 }
 
 .button-controls {
-	width: 500px;
+	width: 700px;
 }
 
 .button-controls > * {
@@ -11,8 +11,8 @@
 	margin-right: 5px;
 }
 
-.layer-select, .file-select {
-	width: 200px;
+.select {
+	width: 220px;
 	display: inline-block;
 }
 

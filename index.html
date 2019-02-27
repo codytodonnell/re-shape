@@ -16,13 +16,13 @@
 	    	<div class="row header">
 	    		<div class="controls col-md-12 d-flex">
 	    			<div class="button-controls">
-	    				<div class="file-select">
+	    				<div class="select">
 		    				<div class="custom-file">
 								<input type="file" multiple class="custom-file-input" id="customFile" onchange="app.upload()">
 								<label class="custom-file-label" for="customFile">Choose file</label>
 							</div>
 						</div>
-	    				<div class="layer-select">
+	    				<div class="select">
 		    				<div class="input-group">
 								<div class="input-group-prepend">
 							    	<label class="input-group-text" for="map-select">Map</label>
@@ -34,7 +34,19 @@
 							 	</select>
 							</div>
 						</div>
-	    				<button id="play-button" class="btn btn-primary">Play</button>
+						<div class="select">
+		    				<div class="input-group">
+								<div class="input-group-prepend">
+							    	<label class="input-group-text" for="y-select">Y Axis</label>
+							  	</div>
+							  	<select class="custom-select" id="y-select" onchange="lineChart.changeYAxis(this.value)">
+							    	<option selected value="distance">Distance (km)</option>
+							    	<option value="lat">Latitude</option>
+							    	<option value="long">Longitude</option>
+							 	</select>
+							</div>
+						</div>
+	    				<!-- <button id="play-button" class="btn btn-primary">Play</button> -->
 	    			</div>
 	    		</div>
 	    	</div>
