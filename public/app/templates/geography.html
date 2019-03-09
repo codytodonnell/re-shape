@@ -1,0 +1,41 @@
+<div class="container-fluid">
+	<div class="row mt-1">
+    	<div class="col-md-5">
+    		<div class="controls d-flex">
+    			<div class="button-controls">
+    				<div class="select">
+						<button class="btn btn-primary" ngf-select="gc.upload($files)" multiple="multiple">Upload Movement Data</button>
+					</div>
+    				<div class="select">
+	    				<div class="input-group">
+							<div class="input-group-prepend">
+						    	<label class="input-group-text" for="map-select">Map</label>
+						  	</div>
+						  	<select class="custom-select" id="map-select" ng-model="gc.baseLayer" ng-change="gc.changeBaseLayer()">
+						    	<option selected value="roads">Roads</option>
+						    	<option value="atlanta-health-coverage">Health Coverage</option>
+						    	<option value="atlanta-health-private">Private Health Coverage</option>
+						 	</select>
+						</div>
+					</div>
+					<div class="select">
+	    				<div class="input-group">
+							<div class="input-group-prepend">
+						    	<label class="input-group-text" for="y-select">Y Axis</label>
+						  	</div>
+						  	<select class="custom-select" id="y-select" ng-model="gc.yAxisValue" ng-change="gc.changeYAxis(gc.yAxisValue)">
+						    	<option selected value="distance">Distance (km)</option>
+						    	<option value="lat">Latitude</option>
+						    	<option value="long">Longitude</option>
+						 	</select>
+						</div>
+					</div>
+    			</div>
+    		</div>
+        	<div id='map'></div>
+        </div>
+        <div id="line-container" class="col-md-7">
+        	<div id='line-tooltip' class="tooltip"></div>
+        </div>
+    </div>
+</div>

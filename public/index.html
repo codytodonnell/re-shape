@@ -1,0 +1,29 @@
+<!doctype html>
+<html class="no-js" lang="en" ng-app="wigs">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>WIGS | Web Interaction Geography Slicer</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="public/app/css/wigs.css">
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link href='https://api.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
+    </head>
+    <body ng-cloak>
+    	<main ui-view></main>
+    	<script src="node_modules/angular/angular.min.js"></script>
+    	<script src="node_modules/ui-router/angularjs/release/angular-ui-router.min.js"></script>
+        <script src="node_modules/d3/dist/d3.min.js"></script>
+        <script src="node_modules/csv2geojson/csv2geojson.js"></script>
+        <script src="node_modules/ng-file-upload/dist/ng-file-upload-shim.min.js"></script>
+        <script src="node_modules/ng-file-upload/dist/ng-file-upload.min.js"></script>
+        <script src='https://api.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+        <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
+        <script src="public/app/app.js"></script>
+        <script src="public/app/services/toGeoJSONService.js"></script>
+        <script src="public/app/services/mapService.js"></script>
+        <script src="public/app/services/lineChartService.js"></script>
+        <script src="public/app/controllers/geographyController.js"></script>
+    </body>
+</html>
