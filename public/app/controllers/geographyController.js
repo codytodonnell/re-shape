@@ -31,8 +31,67 @@ angular.module('wigs')
 
 	vm.yAxisValue = 'distance';
 
+	vm.pathsLookup = mapService.pathsLookup;
+
+	vm.pathsLoaded = false;
+
+	/**
+	 *
+	 * Include a reference to lineChartService's changeYAxis function in this controller's scope
+	 * This enables it to be used in the template on the select input
+	 *
+	 */
 	vm.changeYAxis =  function(value) {
 		lineChartService.changeYAxis(value);
+	}
+
+	/**
+	 *
+	 * Check the clicked path's visibility and toggle it
+	 * Simply shows or hides the map line, map point, and chart line for the clicked path.
+	 * Visibility is also maintained in pathsLookup to enable conditional styling in the template.
+	 *
+	 */
+	vm.togglePath = function(pathId) {
+		var visibility = map.getLayoutProperty(pathId, 'visibility');
+		var number = pathId.split('path')[1];
+		var pointId = 'point' + number;
+
+		if(visibility === 'visible') {
+			map.setLayoutProperty(pathId, 'visibility', 'none');
+			map.setLayoutProperty(pointId, 'visibility', 'none');
+			lineChartService.toggleLine(pathId, false);
+			vm.pathsLookup[pathId].visible = false;
+		} else {
+			map.setLayoutProperty(pathId, 'visibility', 'visible');
+			map.setLayoutProperty(pointId, 'visibility', 'visible');
+			lineChartService.toggleLine(pathId, true);
+			vm.pathsLookup[pathId].visible = true;
+		}
+	}
+
+	/**
+	 *
+	 * Included a show all function for convenience
+	 *
+	 */
+	vm.showAllPaths = function() {
+		for (key in vm.pathsLookup) {
+			var number = key.split('path')[1];
+			var pointId = 'point' + number;
+			map.setLayoutProperty(key, 'visibility', 'visible');
+			map.setLayoutProperty(pointId, 'visibility', 'visible');
+			lineChartService.toggleLine(key, true);
+			vm.pathsLookup[key].visible = true;
+		}
+	}
+
+	vm.stylePathButton = function(pathId) {
+		if(vm.pathsLookup[pathId].visible) {
+			return {'background-color': vm.pathsLookup[pathId].color};
+		} else {
+			return {'background-color': '#f8f9fa'};
+		}
 	}
 
 	/**
@@ -85,6 +144,7 @@ angular.module('wigs')
 		for (const file of files) {
 			await processFile(file);
 		}
+		vm.pathsLoaded = true;
 		console.log("done processing files");
 	}
 
@@ -99,8 +159,8 @@ angular.module('wigs')
 		return new Promise(function(resolve, reject) {
 			var fr = new FileReader();
 			fr.onload = function(e) {
-				mapService.pathsLookup["path" + mapService.pathNumber++] = convertToGeoJSON(e.target.result, fileType);
-				resolve(mapService.pathsLookup);
+				vm.pathsLookup["path" + mapService.pathNumber++] = convertToGeoJSON(e.target.result, fileType);
+				resolve(vm.pathsLookup);
 			}
 			fr.readAsText(file);
 		});
@@ -115,13 +175,16 @@ angular.module('wigs')
 		var geojson;
 		if(fileType === 'gpx') {
 			geojson = toGeoJSON.gpx((new DOMParser()).parseFromString(fileContent, 'text/xml'));
-		} else if(fileType === 'csv' || fileType === 'tsv') {
+		} else if(fileType === 'csv' || fileType === 'tsv' || fileType === 'txt') {
 			csv2geojson.csv2geojson(fileContent, {
-			    latfield: 'X',
-			    lonfield: 'Y',
-			    delimiter: ','
+			    latfield: 'latitude',
+			    lonfield: 'longitude',
+			    line: true,
+			    delimiter: 'auto'
 			}, function(err, data) {
-				geojson = data;
+				geojson = csv2geojson.toLine(data);
+				geojson.features[0].properties.coordTimes = geojson.features[0].properties.time;
+				delete geojson.features[0].properties.time;
 			});
 		} else if(fileType === 'json' || 'geojson') {
 			geojson = fileContent;
@@ -131,10 +194,9 @@ angular.module('wigs')
 
 	function processGeojson() {
 		console.log("processing geojson");
-		for (key in mapService.pathsLookup) {
-			var path = mapService.pathsLookup[key];
-			addDistanceData(path);
-			addPath(path, key);
+		for (key in vm.pathsLookup) {
+			addDistanceData(key);
+			addPath(key);
 		}
 		console.log(lineChartService.data);
 	}
@@ -145,8 +207,9 @@ angular.module('wigs')
 	 * Build array of objects for the lineChart
 	 *
 	 */
-	function addDistanceData(path) {
+	function addDistanceData(pathId) {
 		var data = [];
+		var path = vm.pathsLookup[pathId];
 		var coords = path.features[0].geometry.coordinates;
 		var coordTimes = path.features[0].properties.coordTimes;
 		
@@ -213,25 +276,29 @@ angular.module('wigs')
 	 *
 	 * Adds a new layer on the map for drawing a new path
 	 * Path layers are given unique identifiers in the form of path[NUMBER]
-	 * The original geojson containing the path points is maintained in mapService.pathsLookup using the unique id
+	 * The original geojson containing the path points is maintained in vm.pathsLookup using the unique id
 	 * Also adds a point for each line to mark the current location when hover over the line chart.
 	 * Points are initialized at the path's first set of coordinates.
 	 *
 	 */
-	function addPath(geojson, layerId) {
-		var number = layerId.split("path")[1];
+	function addPath(pathId) {
+		var path = vm.pathsLookup[pathId];
+		var number = pathId.split("path")[1];
 		var color = number <= colors.length - 1 ? colors[number] : colors[number % colors.length];
-		var geometryType = geojson.features[0].geometry.type;
+		var geometryType = path.features[0].geometry.type;
 		var pointInitialCoordinates = null;
 
+		path.color = color;
+		path.visible = true;
+
 		if(geometryType === 'LineString') {
-			pointInitialCoordinates = geojson.features[0].geometry.coordinates[0];
+			pointInitialCoordinates = path.features[0].geometry.coordinates[0];
 		} else if(geometryType === 'MultiLineString') {
-			pointInitialCoordinates = geojson.features[0].geometry.coordinates[0][0];
+			pointInitialCoordinates = path.features[0].geometry.coordinates[0][0];
 		}
 		
-		var layer = {
-			"id": layerId,
+		var line = {
+			"id": pathId,
 			"type": "line",
 			"source": {
 				"type": "geojson",
@@ -277,10 +344,12 @@ angular.module('wigs')
 			}
 		};
 
-		map.addLayer(layer);
+		map.addLayer(line);
 		map.addLayer(point);
 
-		return mapService.pathsLookup;
+		$scope.$apply();
+
+		return vm.pathsLookup;
 	}
 }]);
 

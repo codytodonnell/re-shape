@@ -2,29 +2,35 @@
 	margin-top: 10px;
 }
 
-.button-controls {
-	width: 700px;
-}
-
-.button-controls > * {
-	vertical-align: top;
-	margin-right: 5px;
-}
-
-.select {
-	width: 210px;
-	display: inline-block;
-	margin-bottom: 10px;
+.controls {
+	height: 12.5vh;
 }
 
 #map {
-	height: 735px;
+	height: 84vh;
 	width: 100%;
 	display: inline-block;
 }
 
 #line-container {
-	height: 875px;
+	height: 100vh;
+}
+
+.btn-dynamic-color {
+    color: #000 !important;
+    border-color: #ccc !important;
+}
+
+.dynamic-button-row {
+	overflow-x: hidden;
+}
+
+.dynamic-button-row:hover {
+	overflow-x: auto;
+}
+
+.dynamic-button-row > *:not(:first-child) {
+	margin-left: 5px;
 }
 
 .node rect {
@@ -47,16 +53,6 @@
 .link:hover {
   stroke-opacity: .5;
 }
-
-#slider {
-/*	position: relative;
-	width: 100%;*/
-	height: 60px;
-}
-
-.controls {
-	height: 110px;
-}  
 
 .ticks {
   font-size: 10px;

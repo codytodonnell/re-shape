@@ -10,8 +10,14 @@ function(mapService) {
 	var fullWidth = parseInt(container.style('width')) - parseInt(container.style('padding-right')) - parseInt(container.style('padding-left')),
 	    fullHeight = parseInt(container.style('height'));
 
-	var margin = {top: 105, right: 50, bottom: 35, left: 25},
-		marginMini = {top: 5, right: 50, bottom: 795, left: 25},
+	// var margin = {top: 105, right: 50, bottom: 35, left: 25},
+	// 	marginMini = {top: 5, right: 50, bottom: 795, left: 25},
+	//     width = fullWidth - margin.left - margin.right,
+	//     height = fullHeight - margin.top - margin.bottom,
+	//     heightMini = fullHeight - marginMini.top - marginMini.bottom;
+
+	var margin = {top: fullHeight*0.12, right: 50, bottom: fullHeight*0.04, left: 25},
+		marginMini = {top: fullHeight*0.005, right: 50, bottom: fullHeight*0.9, left: 25},
 	    width = fullWidth - margin.left - margin.right,
 	    height = fullHeight - margin.top - margin.bottom,
 	    heightMini = fullHeight - marginMini.top - marginMini.bottom;
@@ -189,7 +195,9 @@ function(mapService) {
 	        .attr("class", "series");
 
 		series.append("path")
-			  .attr("class", "line")
+			  .attr("class", function(d, i) {
+			  	return "line " + "path" + i;
+			  })
 			  .attr("d", line)
 			  .style("stroke", function(d, i) {
 			  	return mapService.colors[i]
@@ -201,7 +209,9 @@ function(mapService) {
 	        .attr("class", "series-mini");
 
 		seriesMini.append("path")
-			  .attr("class", "line")
+			  .attr("class", function(d, i) {
+			  	return "line " + "path" + i;
+			  })
 			  .attr("d", lineMini)
 			  .style("stroke", function(d, i) {
 			  	return mapService.colors[i]
@@ -298,12 +308,21 @@ function(mapService) {
 
 	}
 
+	function toggleLine(pathId, visible) {
+		d3.selectAll('.' + pathId)
+			.transition()
+			.style("opacity", function(d) {
+				return visible ? 1 : 0;
+			});
+	}
+
 	return {
 		data: data,
 		xScale: xScale,
 		xScaleMini: xScaleMini,
 		yScale: yScale,
 		render: render,
-		changeYAxis: changeYAxis
+		changeYAxis: changeYAxis,
+		toggleLine: toggleLine
 	}
 }]);
