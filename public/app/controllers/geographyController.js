@@ -31,7 +31,7 @@ angular.module('wigs')
 
 	vm.yAxisValue = 'lat';
 
-	vm.pathsLookup = mapService.pathsLookup;
+	vm.lookup = mapService.lookup;
 
 	vm.pathsLoaded = false;
 
@@ -68,12 +68,12 @@ angular.module('wigs')
 			map.setLayoutProperty(pathId, 'visibility', 'none');
 			map.setLayoutProperty(pointId, 'visibility', 'none');
 			lineChartService.toggleLine(pathId, false);
-			vm.pathsLookup[pathId].visible = false;
+			vm.lookup.paths[pathId].visible = false;
 		} else {
 			map.setLayoutProperty(pathId, 'visibility', 'visible');
 			map.setLayoutProperty(pointId, 'visibility', 'visible');
 			lineChartService.toggleLine(pathId, true);
-			vm.pathsLookup[pathId].visible = true;
+			vm.lookup.paths[pathId].visible = true;
 		}
 	}
 
@@ -83,19 +83,19 @@ angular.module('wigs')
 	 *
 	 */
 	vm.showAllPaths = function() {
-		for (key in vm.pathsLookup) {
+		for (key in vm.lookup.paths) {
 			var number = key.split('path')[1];
 			var pointId = 'point' + number;
 			map.setLayoutProperty(key, 'visibility', 'visible');
 			map.setLayoutProperty(pointId, 'visibility', 'visible');
 			lineChartService.toggleLine(key, true);
-			vm.pathsLookup[key].visible = true;
+			vm.lookup.paths[key].visible = true;
 		}
 	}
 
 	vm.stylePathButton = function(pathId) {
-		if(vm.pathsLookup[pathId].visible) {
-			return {'background-color': vm.pathsLookup[pathId].color};
+		if(vm.lookup.paths[pathId].visible) {
+			return {'background-color': vm.lookup.paths[pathId].color};
 		} else {
 			return {'background-color': '#f8f9fa'};
 		}
@@ -149,7 +149,7 @@ angular.module('wigs')
 	async function processFiles(files) {
 		console.log("processing files");
 		mapService.clearMap();
-		vm.pathsLookup = mapService.pathsLookup;
+		lineChartService.clearChart();
 		for (const file of files) {
 			await processFile(file);
 		}
@@ -168,8 +168,8 @@ angular.module('wigs')
 		return new Promise(function(resolve, reject) {
 			var fr = new FileReader();
 			fr.onload = function(e) {
-				vm.pathsLookup["path" + mapService.pathNumber++] = convertToGeoJSON(e.target.result, fileType);
-				resolve(vm.pathsLookup);
+				vm.lookup.paths["path" + vm.lookup.number++] = convertToGeoJSON(e.target.result, fileType);
+				resolve(vm.lookup.paths);
 			}
 			fr.readAsText(file);
 		});
@@ -203,11 +203,10 @@ angular.module('wigs')
 
 	function processGeojson() {
 		console.log("processing geojson");
-		for (key in vm.pathsLookup) {
+		for (key in vm.lookup.paths) {
 			addDistanceData(key);
 			addPath(key);
 		}
-		console.log(lineChartService.data);
 	}
 
 	/**
@@ -218,7 +217,7 @@ angular.module('wigs')
 	 */
 	function addDistanceData(pathId) {
 		var data = [];
-		var path = vm.pathsLookup[pathId];
+		var path = vm.lookup.paths[pathId];
 		var coords = path.features[0].geometry.coordinates;
 		var coordTimes = path.features[0].properties.coordTimes;
 		
@@ -276,7 +275,7 @@ angular.module('wigs')
 			});
 		}
 
-		lineChartService.data.push(data);
+		lineChartService.data.paths.push(data);
 		console.log("added a distance array");
 		return lineChartService.data;
 	}
@@ -285,13 +284,13 @@ angular.module('wigs')
 	 *
 	 * Adds a new layer on the map for drawing a new path
 	 * Path layers are given unique identifiers in the form of path[NUMBER]
-	 * The original geojson containing the path points is maintained in vm.pathsLookup using the unique id
+	 * The original geojson containing the path points is maintained in vm.lookup.paths using the unique id
 	 * Also adds a point for each line to mark the current location when hover over the line chart.
 	 * Points are initialized at the path's first set of coordinates.
 	 *
 	 */
 	function addPath(pathId) {
-		var path = vm.pathsLookup[pathId];
+		var path = vm.lookup.paths[pathId];
 		var number = pathId.split("path")[1];
 		var color = number <= colors.length - 1 ? colors[number] : colors[number % colors.length];
 		var geometryType = path.features[0].geometry.type;
@@ -358,7 +357,7 @@ angular.module('wigs')
 
 		$scope.$apply();
 
-		return vm.pathsLookup;
+		return vm.lookup.paths;
 	}
 
 	function rescaleFromMapBounds() {
@@ -367,7 +366,7 @@ angular.module('wigs')
 	}
 
 	// function clearMap() {
-	// 	for (key in vm.pathsLookup) {
+	// 	for (key in vm.lookup.paths) {
 	// 		var number = key.split("path")[1];
 	// 		map.removeLayer('point' + number);
 	// 		map.removeLayer(key);
@@ -375,7 +374,7 @@ angular.module('wigs')
 	// 		map.removeSource(key);
 	// 	}
 	// 	mapService.pathsLookup = {};
-	// 	vm.pathsLookup = mapService.pathsLookup;
+	// 	vm.lookup.paths = mapService.pathsLookup;
 	// 	mapService.pathNumber = 0;
 	// }
 }]);

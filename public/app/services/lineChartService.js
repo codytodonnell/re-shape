@@ -22,7 +22,9 @@ function(mapService) {
 	    height = fullHeight - margin.top - margin.bottom,
 	    heightMini = fullHeight - marginMini.top - marginMini.bottom;
 
-	var data = [];
+	var data = {
+		paths: []
+	};
 
 	var colors = mapService.colors;
 
@@ -157,13 +159,10 @@ function(mapService) {
 
 	function render() {
 
-		d3.selectAll('.series, .series-mini')
-			.remove();
-			
 		var mergedData = [];
 
 		// Need to modify to support multi line strings
-		data.forEach(function(d) {
+		data.paths.forEach(function(d) {
 			mergedData = mergedData.concat(d);
 		});
 
@@ -176,11 +175,11 @@ function(mapService) {
 		max.minilong = d3.max(mergedData, function(d) { return d.long; });
 		min.distance = d3.min(mergedData, function(d) { return d.distance; });
 		max.distance = d3.max(mergedData, function(d) { return d.distance; });
-		//max.distance = d3.min([]);
+		max.distance = d3.min([100, max.distance]);
 		xScale.domain(d3.extent(mergedData, function(d) { return d.date; }));
 		xScaleMini.domain(d3.extent(mergedData, function(d) { return d.date; }));
 		yScale.domain([min[ySelector.value], max[ySelector.value]]).nice();
-		yScaleMini.domain([min[miniBoundKey], max[miniBoundKey]]).nice();
+		yScaleMini.domain([min[miniBoundKey], max[miniBoundKey]]).nice().clamp(true);
 		line.y(function(d) { return yScale(d[ySelector.value]); });
 		lineMini.y(function(d) { return yScaleMini(d[ySelector.value]); });
 
@@ -197,7 +196,7 @@ function(mapService) {
 			.call(xAxisMini);
 
 		var series = chart.selectAll(".series")
-	        .data(data)
+	        .data(data.paths)
 	        .enter().append("g")
 	        .attr("class", "series");
 
@@ -212,7 +211,7 @@ function(mapService) {
 			  });
 
 		var seriesMini = mini.selectAll(".series-mini")
-	        .data(data)
+	        .data(data.paths)
 	        .enter().append("g")
 	        .attr("class", "series-mini");
 
@@ -347,6 +346,11 @@ function(mapService) {
 			});
 	}
 
+	function clearChart() {
+		d3.selectAll('.series, .series-mini').remove();
+		data.paths = [];
+	}
+
 	return {
 		data: data,
 		xScale: xScale,
@@ -355,6 +359,7 @@ function(mapService) {
 		render: render,
 		changeYAxis: changeYAxis,
 		rescaleYAxis: rescaleYAxis,
-		toggleLine: toggleLine
+		toggleLine: toggleLine,
+		clearChart: clearChart
 	}
 }]);

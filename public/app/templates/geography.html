@@ -5,7 +5,7 @@
 				<div class="d-flex dynamic-button-row mb-3">
 					<button class="btn btn-primary mr-auto flex-shrink-0" ngf-select="gc.upload($files)" multiple="multiple">Upload Movement Data</button>
 					<button class="btn btn-light flex-shrink-0" ng-show="gc.pathsLoaded" ng-click="gc.showAllPaths()">Show All</button>
-					<button class="btn btn-dynamic-color" ng-repeat="(key, value) in gc.pathsLookup" ng-click="gc.togglePath(key)" ng-style="gc.stylePathButton(key)">{{$index+1}}</button>
+					<button class="btn btn-dynamic-color" ng-repeat="(key, value) in gc.lookup.paths" ng-click="gc.togglePath(key)" ng-style="gc.stylePathButton(key)">{{$index+1}}</button>
 				</div>
 				<div class="d-flex button-row">
     				<div class="input-group mr-2">

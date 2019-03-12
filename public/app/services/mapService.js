@@ -4,8 +4,10 @@ angular.module('wigs')
 function() {
 
 	var colors = ["#66c2a5","#e78ac3","#ffd92f","#e5c494","#b3b3b3","#8da0cb","#fc8d62","#a6d854"];
-	var pathNumber = 0;
-	var pathsLookup = {};
+	var lookup = {
+		paths: {},
+		number: 0
+	};
 	var map;
 
 	function setMap(value) {
@@ -19,8 +21,8 @@ function() {
 	 *
 	 */
 	function drawFilteredPath(domainMin, domainMax) {
-		for (key in this.pathsLookup) {
-			var path = this.pathsLookup[key];
+		for (key in lookup.paths) {
+			var path = lookup.paths[key];
 			var pathData = path.features[0];
 			var data = {
 				"type": "Feature",
@@ -170,8 +172,8 @@ function() {
 	 *
 	 */
 	function moveLocationPoints(selectedTime) {
-		for (key in this.pathsLookup) {
-			var path = this.pathsLookup[key];
+		for (key in lookup.paths) {
+			var path = lookup.paths[key];
 			var pathData = path.features[0];
 			var number = key.split("path")[1];
 			var coordIndex,
@@ -209,21 +211,20 @@ function() {
 	}
 
 	function clearMap() {
-		for (key in this.pathsLookup) {
+		for (key in lookup.paths) {
 			var number = key.split("path")[1];
 			map.removeLayer('point' + number);
 			map.removeLayer(key);
 			map.removeSource('point' + number);
 			map.removeSource(key);
 		}
-		this.pathsLookup = {};
-		pathNumber = 0;
+		lookup.paths = {};
+		lookup.number = 0;
 	}
 
 	return {
 		colors: colors,
-		pathsLookup: pathsLookup,
-		pathNumber: pathNumber,
+		lookup: lookup,
 		setMap: setMap,
 		drawFilteredPath: drawFilteredPath,
 		moveLocationPoints: moveLocationPoints,
