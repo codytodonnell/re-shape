@@ -10,12 +10,18 @@
 				<div class="d-flex button-row">
     				<div class="input-group mr-2">
 						<div class="input-group-prepend">
-					    	<label class="input-group-text" for="map-select">Map</label>
+					    	<label class="input-group-text" for="map-select">Data Layer</label>
 					  	</div>
 					  	<select class="custom-select" id="map-select" ng-model="gc.baseLayer" ng-change="gc.changeBaseLayer()">
-					    	<option selected value="roads">Roads</option>
-					    	<option value="atlanta-health-coverage">Health Coverage</option>
-					    	<option value="atlanta-health-private">Private Health Coverage</option>
+					    	<option selected value="none">None</option>
+					    	<option value="georgia-pop-white">White Population</option>
+					    	<option value="georgia-pop-black">Black Population</option>
+					    	<option value="georgia-pop-hispanic">Hispanic Population</option>
+					    	<option value="georgia-pop-asian">Asian Population</option>
+					    	<option value="georgia-pop-20-24">Age 20-24 Population</option>
+					    	<option value="georgia-pop-25-34">Age 25-34 Population</option>
+					    	<option value="atlanta-health-coverage">Health Insurance Coverage</option>
+					    	<option value="marta-lines">MARTA</option>
 					 	</select>
 					</div>
     				<!-- <div class="input-group">

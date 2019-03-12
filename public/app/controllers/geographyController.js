@@ -1,7 +1,7 @@
 angular.module('wigs')
 
-.controller('geographyController', ['$scope', 'mapService', 'lineChartService', 'toGeoJSON',
- function($scope, mapService, lineChartService, toGeoJSON) {
+.controller('geographyController', ['$scope', 'mapService', 'lineChartService', 'toGeoJSON', 'jsonService',
+ function($scope, mapService, lineChartService, toGeoJSON, jsonService) {
 	var vm = this;
 
 	/**
@@ -22,12 +22,19 @@ angular.module('wigs')
 
 	const baseLayers = [
 		'atlanta-health-coverage',
-		'atlanta-health-private'
+		'georgia-pop-white',
+		'georgia-pop-black',
+		'georgia-pop-hispanic',
+		'georgia-pop-asian',
+		'georgia-pop-20-24', 
+		'georgia-pop-25-34', 
+		'marta-lines',
+		'marta-stations'
 	];
 
 	const colors = mapService.colors;
 
-	vm.baseLayer = 'roads';
+	vm.baseLayer = 'none';
 
 	vm.yAxisValue = 'lat';
 
@@ -40,6 +47,8 @@ angular.module('wigs')
 	map.on('zoom', rescaleFromMapBounds);
 
 	map.on('drag', rescaleFromMapBounds);
+
+	vm.makeData = jsonService.addGeorgiaPopulationFields;
 
 	/**
 	 *
@@ -111,9 +120,11 @@ angular.module('wigs')
 	 */
 	vm.changeBaseLayer = function() {
 		baseLayers.forEach(function(d) {
-			if(vm.baseLayer === 'roads') {
+			if(vm.baseLayer === 'none') {
 				map.setLayoutProperty(d, 'visibility', 'none');
 			} else if(d === vm.baseLayer) {
+				map.setLayoutProperty(d, 'visibility', 'visible');
+			} else if(d === 'marta-stations' && vm.baseLayer === 'marta-lines') {
 				map.setLayoutProperty(d, 'visibility', 'visible');
 			} else {
 				map.setLayoutProperty(d, 'visibility', 'none');
@@ -192,7 +203,9 @@ angular.module('wigs')
 			    delimiter: 'auto'
 			}, function(err, data) {
 				geojson = csv2geojson.toLine(data);
-				geojson.features[0].properties.coordTimes = geojson.features[0].properties.time;
+				geojson.features[0].properties.coordTimes = geojson.features[0].properties.time.map(function(d) {
+					return d + 'Z';
+				});
 				delete geojson.features[0].properties.time;
 			});
 		} else if(fileType === 'json' || 'geojson') {
