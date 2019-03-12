@@ -3,7 +3,7 @@ angular.module('wigs')
 .factory('mapService', [
 function() {
 
-	var colors = ["#66c2a5","#D31021","#ffd92f","#885053","#b3b3b3","#923FBF","#fc8d62","#a6d854"];
+	var colors = ["#66c2a5","#D31021","#ffd92f","#923FBF","#fc8d62","#885053","#b3b3b3","#a6d854"];
 	var lookup = {
 		paths: {},
 		number: 0
