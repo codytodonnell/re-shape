@@ -42,6 +42,8 @@ angular.module('wigs')
 
 	vm.pathsLoaded = false;
 
+	vm.anyVisible = false;
+
 	map.on('load', rescaleFromMapBounds);
 
 	map.on('zoom', rescaleFromMapBounds);
@@ -84,6 +86,8 @@ angular.module('wigs')
 			lineChartService.toggleLine(pathId, true);
 			vm.lookup.paths[pathId].visible = true;
 		}
+
+		//vm.anyVisible = checkIfVisiblePaths();
 	}
 
 	/**
@@ -100,6 +104,27 @@ angular.module('wigs')
 			lineChartService.toggleLine(key, true);
 			vm.lookup.paths[key].visible = true;
 		}
+		vm.anyVisible = true;
+	}
+
+	vm.hideAllPaths = function() {
+		for (key in vm.lookup.paths) {
+			var number = key.split('path')[1];
+			var pointId = 'point' + number;
+			map.setLayoutProperty(key, 'visibility', 'none');
+			map.setLayoutProperty(pointId, 'visibility', 'none');
+			lineChartService.toggleLine(key, false);
+			vm.lookup.paths[key].visible = false;
+		}
+		vm.anyVisible = false;
+	}
+
+	vm.checkIfAllVisible = function() {
+		var allVisible = true;
+		for (key in vm.lookup.paths) {
+			if (vm.lookup.paths[key].visible === false) allVisible = false;
+		}
+		return allVisible;
 	}
 
 	vm.stylePathButton = function(pathId) {
@@ -377,18 +402,5 @@ angular.module('wigs')
 		var bounds = map.getBounds();
 		lineChartService.rescaleYAxis(bounds);
 	}
-
-	// function clearMap() {
-	// 	for (key in vm.lookup.paths) {
-	// 		var number = key.split("path")[1];
-	// 		map.removeLayer('point' + number);
-	// 		map.removeLayer(key);
-	// 		map.removeSource('point' + number);
-	// 		map.removeSource(key);
-	// 	}
-	// 	mapService.pathsLookup = {};
-	// 	vm.lookup.paths = mapService.pathsLookup;
-	// 	mapService.pathNumber = 0;
-	// }
 }]);
 
