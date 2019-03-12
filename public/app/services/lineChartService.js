@@ -24,7 +24,7 @@ function(mapService) {
 
 	var data = [];
 
-	var lineNumber = 0;
+	var colors = mapService.colors;
 
 	// format time as 
 	var formatTime = d3.timeFormat("%B %d %I:%M%p");
@@ -156,6 +156,10 @@ function(mapService) {
 		.attr('class', 'tooltip-line-label');		
 
 	function render() {
+
+		d3.selectAll('.series, .series-mini')
+			.remove();
+			
 		var mergedData = [];
 
 		// Need to modify to support multi line strings
@@ -163,17 +167,20 @@ function(mapService) {
 			mergedData = mergedData.concat(d);
 		});
 
+		var miniBoundKey = ySelector.value === 'distance' ? ySelector.value : 'mini' + ySelector.value;
+
 		// Scale the range of the data
-		min.lat = d3.min(mergedData, function(d) { return d.lat; });
-		max.lat = d3.max(mergedData, function(d) { return d.lat; });
-		min.long = d3.min(mergedData, function(d) { return d.long; });
-		max.long = d3.max(mergedData, function(d) { return d.long; });
+		min.minilat = d3.min(mergedData, function(d) { return d.lat; });
+		max.minilat = d3.max(mergedData, function(d) { return d.lat; });
+		min.minilong = d3.min(mergedData, function(d) { return d.long; });
+		max.minilong = d3.max(mergedData, function(d) { return d.long; });
 		min.distance = d3.min(mergedData, function(d) { return d.distance; });
 		max.distance = d3.max(mergedData, function(d) { return d.distance; });
+		//max.distance = d3.min([]);
 		xScale.domain(d3.extent(mergedData, function(d) { return d.date; }));
 		xScaleMini.domain(d3.extent(mergedData, function(d) { return d.date; }));
 		yScale.domain([min[ySelector.value], max[ySelector.value]]).nice();
-		yScaleMini.domain([min[ySelector.value], max[ySelector.value]]).nice();
+		yScaleMini.domain([min[miniBoundKey], max[miniBoundKey]]).nice();
 		line.y(function(d) { return yScale(d[ySelector.value]); });
 		lineMini.y(function(d) { return yScaleMini(d[ySelector.value]); });
 
@@ -200,7 +207,8 @@ function(mapService) {
 			  })
 			  .attr("d", line)
 			  .style("stroke", function(d, i) {
-			  	return mapService.colors[i]
+			  	var color = i <= colors.length - 1 ? colors[i] : colors[i % colors.length];
+			  	return color;
 			  });
 
 		var seriesMini = mini.selectAll(".series-mini")
@@ -214,7 +222,8 @@ function(mapService) {
 			  })
 			  .attr("d", lineMini)
 			  .style("stroke", function(d, i) {
-			  	return mapService.colors[i]
+			  	var color = i <= colors.length - 1 ? colors[i] : colors[i % colors.length];
+			  	return color;
 			  });
 
 		mapService.drawFilteredPath(xScale.domain()[0], xScale.domain()[1]);
@@ -283,8 +292,9 @@ function(mapService) {
 	}
 
 	function changeYAxis(key) {
+		var miniBoundKey = key === 'distance' ? key : 'mini' + key;
 		yScale.domain([min[key], max[key]]).nice();
-		yScaleMini.domain([min[key], max[key]]).nice();
+		yScaleMini.domain([min[miniBoundKey], max[miniBoundKey]]).nice();
 		line.y(function(d) { return yScale(d[key]); });
 		lineMini.y(function(d) { return yScaleMini(d[key]); });
 
@@ -308,6 +318,27 @@ function(mapService) {
 
 	}
 
+	function rescaleYAxis(bounds) {
+		min.lat = bounds._sw.lat;
+		min.long = bounds._sw.lng;
+		max.lat = bounds._ne.lat;
+		max.long = bounds._ne.lng;
+
+		if(ySelector.value !== 'distance') {
+			yScale.domain([min[ySelector.value], max[ySelector.value]]).nice();
+			line.y(function(d) { return yScale(d[ySelector.value]); });
+
+			focus.select('.y.axis')
+				.transition()
+				.call(yAxis);
+
+			d3.selectAll('.series path')
+				.transition()
+				.duration(750)
+				.attr("d", line);
+		}
+	}
+
 	function toggleLine(pathId, visible) {
 		d3.selectAll('.' + pathId)
 			.transition()
@@ -323,6 +354,7 @@ function(mapService) {
 		yScale: yScale,
 		render: render,
 		changeYAxis: changeYAxis,
+		rescaleYAxis: rescaleYAxis,
 		toggleLine: toggleLine
 	}
 }]);

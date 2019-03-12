@@ -19,8 +19,8 @@ function() {
 	 *
 	 */
 	function drawFilteredPath(domainMin, domainMax) {
-		for (key in pathsLookup) {
-			var path = pathsLookup[key];
+		for (key in this.pathsLookup) {
+			var path = this.pathsLookup[key];
 			var pathData = path.features[0];
 			var data = {
 				"type": "Feature",
@@ -170,8 +170,8 @@ function() {
 	 *
 	 */
 	function moveLocationPoints(selectedTime) {
-		for (key in pathsLookup) {
-			var path = pathsLookup[key];
+		for (key in this.pathsLookup) {
+			var path = this.pathsLookup[key];
 			var pathData = path.features[0];
 			var number = key.split("path")[1];
 			var coordIndex,
@@ -208,12 +208,25 @@ function() {
 		}
 	}
 
+	function clearMap() {
+		for (key in this.pathsLookup) {
+			var number = key.split("path")[1];
+			map.removeLayer('point' + number);
+			map.removeLayer(key);
+			map.removeSource('point' + number);
+			map.removeSource(key);
+		}
+		this.pathsLookup = {};
+		pathNumber = 0;
+	}
+
 	return {
 		colors: colors,
 		pathsLookup: pathsLookup,
 		pathNumber: pathNumber,
 		setMap: setMap,
 		drawFilteredPath: drawFilteredPath,
-		moveLocationPoints: moveLocationPoints
+		moveLocationPoints: moveLocationPoints,
+		clearMap: clearMap
 	}
 }]);

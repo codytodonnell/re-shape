@@ -29,11 +29,17 @@ angular.module('wigs')
 
 	vm.baseLayer = 'roads';
 
-	vm.yAxisValue = 'distance';
+	vm.yAxisValue = 'lat';
 
 	vm.pathsLookup = mapService.pathsLookup;
 
 	vm.pathsLoaded = false;
+
+	map.on('load', rescaleFromMapBounds);
+
+	map.on('zoom', rescaleFromMapBounds);
+
+	map.on('drag', rescaleFromMapBounds);
 
 	/**
 	 *
@@ -43,6 +49,7 @@ angular.module('wigs')
 	 */
 	vm.changeYAxis =  function(value) {
 		lineChartService.changeYAxis(value);
+		console.log(map.getBounds());
 	}
 
 	/**
@@ -141,6 +148,8 @@ angular.module('wigs')
 	 */
 	async function processFiles(files) {
 		console.log("processing files");
+		mapService.clearMap();
+		vm.pathsLookup = mapService.pathsLookup;
 		for (const file of files) {
 			await processFile(file);
 		}
@@ -223,9 +232,9 @@ angular.module('wigs')
 		if(path.features[0].geometry.type === 'LineString') {
 			coords.forEach(function(c, i) {
 				var distance = 0;
-				if(i > 0) {
-					var line = turf.linestring(coords.slice(0, i));
-					distance = turf.lineDistance(line);
+				if(i > 1) {
+					var line = turf.lineString(coords.slice(0, i));
+					distance = turf.length(line, {units: 'miles'});
 				}
 				data.push({
 					date: new Date(coordTimes[i]),
@@ -247,9 +256,9 @@ angular.module('wigs')
 			coords.forEach(function(segment, ii) {
 				segment.forEach(function(c, i) {
 					var distance = 0;
-					if(i > 0) {
-						var line = turf.linestring(segment.slice(0, i));
-						distance = turf.lineDistance(line);
+					if(i > 1) {
+						var line = turf.lineString(segment.slice(0, i));
+						distance = turf.length(line, {units: 'miles'});
 					}
 					if(ii > 0) {
 						distance = distance + distanceAsOfSegment[ii - 1];
@@ -351,5 +360,23 @@ angular.module('wigs')
 
 		return vm.pathsLookup;
 	}
+
+	function rescaleFromMapBounds() {
+		var bounds = map.getBounds();
+		lineChartService.rescaleYAxis(bounds);
+	}
+
+	// function clearMap() {
+	// 	for (key in vm.pathsLookup) {
+	// 		var number = key.split("path")[1];
+	// 		map.removeLayer('point' + number);
+	// 		map.removeLayer(key);
+	// 		map.removeSource('point' + number);
+	// 		map.removeSource(key);
+	// 	}
+	// 	mapService.pathsLookup = {};
+	// 	vm.pathsLookup = mapService.pathsLookup;
+	// 	mapService.pathNumber = 0;
+	// }
 }]);
 
