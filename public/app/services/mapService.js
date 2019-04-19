@@ -5,7 +5,7 @@ function() {
 
 	var colors = ["#66c2a5","#D31021","#ffd92f","#923FBF","#fc8d62","#885053","#b3b3b3","#a6d854"];
 	var lookup = {
-		paths: {},
+		tracks: {},
 		number: 0
 	};
 	var map;
@@ -14,29 +14,33 @@ function() {
 		map = value;
 	}
 
+	function getMap() {
+		return map;
+	}
+
 	/**
 	 *
-	 * For each path in pathsLookup, draw the path on the map
+	 * For each track in tracksLookup, draw the track on the map
 	 * Only draws the points that fall within the time range set by the brush
 	 *
 	 */
-	function drawFilteredPath(domainMin, domainMax) {
-		for (key in lookup.paths) {
-			var path = lookup.paths[key];
-			var pathData = path.features[0];
+	function drawFilteredTrack(domainMin, domainMax) {
+		for (key in lookup.tracks) {
+			var track = lookup.tracks[key];
+			var trackData = track.features[0];
 			var data = {
 				"type": "Feature",
 				"properties": {
-					"name": pathData.properties.name,
-					"time": pathData.properties.time,
+					"name": trackData.properties.name,
+					"time": trackData.properties.time,
 					"coordTimes": []
 				},
 				"geometry": {
-					"type": pathData.geometry.type,
+					"type": trackData.geometry.type,
 					"coordinates": []
 				}
 			};
-			var filtered = filterCoordinates(pathData, domainMin, domainMax);
+			var filtered = filterCoordinates(trackData, domainMin, domainMax);
 			data.properties.coordTimes = filtered.coordTimes;
 			data.geometry.coordinates = filtered.coordinates;
 			map.getSource(key).setData(data);
@@ -45,7 +49,7 @@ function() {
 
 	/**
 	 *
-	 * Filter the coordinates of all uploaded paths based on the boundaries set by the line chart brush.
+	 * Filter the coordinates of all uploaded tracks based on the boundaries set by the line chart brush.
 	 * Returns an object with two arrays: one for coordinates and one for coordTimes.
 	 * Handles geojson types LineStrings and MultiLineStrings
 	 *
@@ -166,16 +170,16 @@ function() {
 
 	/**
 	 *
-	 * Move each path's location point when hover over a chart time.
+	 * Move each track's location point when hover over a chart time.
 	 * For LineStrings and MultiLineStrings, this finds the first coordinate 
 	 * that is greater than or equal to the time selected on the chart.
 	 *
 	 */
 	function moveLocationPoints(selectedTime) {
-		for (key in lookup.paths) {
-			var path = lookup.paths[key];
-			var pathData = path.features[0];
-			var number = key.split("path")[1];
+		for (key in lookup.tracks) {
+			var track = lookup.tracks[key];
+			var trackData = track.features[0];
+			var number = key.split("track")[1];
 			var coordIndex,
 				coordLineIndex;
 			var data = {
@@ -183,25 +187,25 @@ function() {
 				"coordinates": []
 			};
 
-			if(pathData.geometry.type === 'LineString') {
-				coordIndex = pathData.properties.coordTimes.findIndex(function(t) {
+			if(trackData.geometry.type === 'LineString') {
+				coordIndex = trackData.properties.coordTimes.findIndex(function(t) {
 					var coordTime = new Date(t);
 					return coordTime >= selectedTime;
 				});
 				if(coordIndex >= 0) {
-					data.coordinates = pathData.geometry.coordinates[coordIndex];
+					data.coordinates = trackData.geometry.coordinates[coordIndex];
 					map.getSource('point' + number).setData(data);
 				}
-			} else if(pathData.geometry.type === 'MultiLineString') {
-				for(var i = 0; i < pathData.properties.coordTimes.length; i++) {
+			} else if(trackData.geometry.type === 'MultiLineString') {
+				for(var i = 0; i < trackData.properties.coordTimes.length; i++) {
 					if(coordLineIndex === undefined) {
-						coordIndex = pathData.properties.coordTimes[i].findIndex(function(t) {
+						coordIndex = trackData.properties.coordTimes[i].findIndex(function(t) {
 							var coordTime = new Date(t);
 							return coordTime >= selectedTime;
 						});
 						if(coordIndex >= 0) {
 							coordLineIndex = i;
-							data.coordinates = pathData.geometry.coordinates[coordLineIndex][coordIndex];
+							data.coordinates = trackData.geometry.coordinates[coordLineIndex][coordIndex];
 							map.getSource('point' + number).setData(data);
 						}
 					}
@@ -211,14 +215,14 @@ function() {
 	}
 
 	function clearMap() {
-		for (key in lookup.paths) {
-			var number = key.split("path")[1];
+		for (key in lookup.tracks) {
+			var number = key.split("track")[1];
 			map.removeLayer('point' + number);
 			map.removeLayer(key);
 			map.removeSource('point' + number);
 			map.removeSource(key);
 		}
-		lookup.paths = {};
+		lookup.tracks = {};
 		lookup.number = 0;
 	}
 
@@ -226,7 +230,8 @@ function() {
 		colors: colors,
 		lookup: lookup,
 		setMap: setMap,
-		drawFilteredPath: drawFilteredPath,
+		getMap: getMap,
+		drawFilteredTrack: drawFilteredTrack,
 		moveLocationPoints: moveLocationPoints,
 		clearMap: clearMap
 	}

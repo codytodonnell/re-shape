@@ -23,7 +23,7 @@ function(mapService) {
 	    heightMini = fullHeight - marginMini.top - marginMini.bottom;
 
 	var data = {
-		paths: []
+		tracks: []
 	};
 
 	var colors = mapService.colors;
@@ -162,7 +162,7 @@ function(mapService) {
 		var mergedData = [];
 
 		// Need to modify to support multi line strings
-		data.paths.forEach(function(d) {
+		data.tracks.forEach(function(d) {
 			mergedData = mergedData.concat(d);
 		});
 
@@ -196,13 +196,13 @@ function(mapService) {
 			.call(xAxisMini);
 
 		var series = chart.selectAll(".series")
-	        .data(data.paths)
+	        .data(data.tracks)
 	        .enter().append("g")
 	        .attr("class", "series");
 
 		series.append("path")
 			  .attr("class", function(d, i) {
-			  	return "line " + "path" + i;
+			  	return "line " + "track" + i;
 			  })
 			  .attr("d", line)
 			  .style("stroke", function(d, i) {
@@ -211,13 +211,13 @@ function(mapService) {
 			  });
 
 		var seriesMini = mini.selectAll(".series-mini")
-	        .data(data.paths)
+	        .data(data.tracks)
 	        .enter().append("g")
 	        .attr("class", "series-mini");
 
 		seriesMini.append("path")
 			  .attr("class", function(d, i) {
-			  	return "line " + "path" + i;
+			  	return "line " + "track" + i;
 			  })
 			  .attr("d", lineMini)
 			  .style("stroke", function(d, i) {
@@ -225,7 +225,7 @@ function(mapService) {
 			  	return color;
 			  });
 
-		mapService.drawFilteredPath(xScale.domain()[0], xScale.domain()[1]);
+		mapService.drawFilteredTrack(xScale.domain()[0], xScale.domain()[1]);
 	}
 
 	function brushed() {
@@ -237,7 +237,7 @@ function(mapService) {
 		svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
 			.scale(width / (s[1] - s[0]))
 			.translate(-s[0], 0));
-		mapService.drawFilteredPath(xScale.domain()[0], xScale.domain()[1]);
+		mapService.drawFilteredTrack(xScale.domain()[0], xScale.domain()[1]);
 	}
 
 	function zoomed() {
@@ -247,7 +247,7 @@ function(mapService) {
 		chart.selectAll(".line").attr("d", line);
 		focus.select(".axis.x").call(xAxis);
 		mini.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
-		mapService.drawFilteredPath(xScale.domain()[0], xScale.domain()[1]);
+		mapService.drawFilteredTrack(xScale.domain()[0], xScale.domain()[1]);
 	}
 
 	function removeTooltip() {
@@ -338,8 +338,8 @@ function(mapService) {
 		}
 	}
 
-	function toggleLine(pathId, visible) {
-		d3.selectAll('.' + pathId)
+	function toggleLine(trackId, visible) {
+		d3.selectAll('.' + trackId)
 			.transition()
 			.style("opacity", function(d) {
 				return visible ? 1 : 0;
@@ -348,7 +348,7 @@ function(mapService) {
 
 	function clearChart() {
 		d3.selectAll('.series, .series-mini').remove();
-		data.paths = [];
+		data.tracks = [];
 	}
 
 	return {

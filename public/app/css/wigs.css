@@ -106,3 +106,64 @@
 	background: #efefef;
 	border: 1px solid #ccc;
 }
+
+.full-screen-modal {
+	position: absolute;
+	width: 100%;
+	height: 0;
+	z-index: 3;
+	color: #fff;
+	text-align: center;
+	background: #2892D7;
+	overflow: hidden;
+	transition: 0.5s;
+}
+
+.full-screen-modal.show-fsm {
+	height: 100%;
+}
+
+.modal-btn {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	z-index: 4;
+    border-radius: 25px;
+    border: solid 1px #ccc;
+    height: 40px;
+    width: 40px;
+    text-align: center;
+    transition: 0.5s;
+}
+
+.modal-btn.modal-btn-up {
+	transform: rotate(180deg);
+	background: #fff;
+	color: #2892D7;
+}
+
+.modal-btn.modal-btn-down {
+	transform: rotate(0deg);
+	background: #2892D7;
+	color: #fff;
+}
+
+.modal-btn > i {
+	line-height: 40px;
+}
+
+/*.full-screen-modal > .bg {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: #2892D7;
+	opacity: 0.9;
+	z-index: 0;
+}
+
+.full-screen-modal > .fg {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1
+}*/

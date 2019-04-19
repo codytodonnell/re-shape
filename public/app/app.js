@@ -1,4 +1,4 @@
-var app = angular.module('wigs', ['ui.router', 'ngFileUpload']);
+var app = angular.module('wigs', ['ui.router', 'ngFileUpload', 'ui.bootstrap']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
 
