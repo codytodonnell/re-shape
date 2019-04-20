@@ -103,7 +103,7 @@ function() {
 
 			/**
 			 *
-			 * Second, loop through coordTime segments and determine the which segments and coordinates to include.
+			 * Second, loop through coordTime segments and determine which segments and coordinates to include.
 			 * When the min coordinate is found, set minLineIndex to the segment the coordinate is in.
 			 * Do the same for the max coordinate.
 			 * If a min coordinate is found but not a max, this means the filter's max value is larger than any coordinate in this data.
@@ -144,14 +144,24 @@ function() {
 			 */
 			for(var i = 0; i < coordTimes.length; i++) {
 				if(minLineIndex === i && maxLineIndex === i) {
-					filteredCoords[i] = coords[i].slice(minCoordIndex, maxCoordIndex);
-					filteredCoordTimes[i] = coordTimes[i].slice(minCoordIndex, maxCoordIndex);
+					if(maxCoordIndex === coords[i].length - 1) {
+						filteredCoords[i] = coords[i].slice(minCoordIndex);
+						filteredCoordTimes[i] = coordTimes[i].slice(minCoordIndex);
+					} else {
+						filteredCoords[i] = coords[i].slice(minCoordIndex, maxCoordIndex);
+						filteredCoordTimes[i] = coordTimes[i].slice(minCoordIndex, maxCoordIndex);
+					}
 				} else if(minLineIndex === i && maxLineIndex !== i) {
 					filteredCoords[i] = coords[i].slice(minCoordIndex);
 					filteredCoordTimes[i] = coordTimes[i].slice(minCoordIndex);
 				} else if(minLineIndex !== i && maxLineIndex === i) {
-					filteredCoords[i] = coords[i].slice(0, maxCoordIndex);
-					filteredCoordTimes[i] = coordTimes[i].slice(0, maxCoordIndex);
+					if(maxCoordIndex === coords[i].length - 1) {
+						filteredCoords[i] = coords[i];
+						filteredCoordTimes[i] = coordTimes[i];
+					} else {
+						filteredCoords[i] = coords[i].slice(0, maxCoordIndex);
+						filteredCoordTimes[i] = coordTimes[i].slice(0, maxCoordIndex);
+					}
 				} else if(i > minLineIndex && i < maxLineIndex) {
 					filteredCoords[i] = coords[i];
 					filteredCoordTimes[i] = coordTimes[i];

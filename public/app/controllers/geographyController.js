@@ -8,6 +8,8 @@ angular.module('wigs')
 	 *
 	 * Initialize the Mapbox map
 	 * Center point determined using bboxfinder.com
+	 * accessToken for Cody O'Donnell
+	 * Mapbox style by Cody O'Donnell
 	 *
 	 */
 	mapboxgl.accessToken = 'pk.eyJ1IjoiY29kb25uZWxsIiwiYSI6ImNqbmNhaTlrNzBndDIzcHBvYnNla2RneHAifQ.OMGQ5aqcWXSsAKc8niEsEw';
@@ -52,10 +54,10 @@ angular.module('wigs')
 
 	vm.makeData = jsonService.addGeorgiaPopulationFields;
 
-	vm.showIntroModal = true;
+	vm.showImporter = true;
 
-	vm.toggleIntroModal = function() {
-		vm.showIntroModal = !vm.showIntroModal;
+	vm.toggleImporter = function() {
+		vm.showImporter = !vm.showImporter;
 	}
 
 	/**
