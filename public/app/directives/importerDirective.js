@@ -171,6 +171,11 @@ angular.module('wigs')
 					 * This ensures that distance from all line segments counts towards total distance accumulation,
 					 * and that distance is not counted from the end point of one segment to the start point of a new segment.
 					 *
+					 * Keep a running tab of all the indices at which data gaps occur in gapIndicesPerSegment
+					 * Ensure segment index and coord index are recorded.
+					 * gaplessCoordSegments and gaplessCoordTimeSegments will ultimately be populated with the cleaned, gapless data.
+					 * Right now a "gap" is considered any two coordinates whose distance from each other is greater than 1 mile.
+					 *
 					 */
 					var distanceAsOfSegment = [];
 					var gapIndicesPerSegment = [];
@@ -205,6 +210,12 @@ angular.module('wigs')
 						});
 					});
 
+					/**
+					 *
+					 * Loop through each line segment and look at where the gaps occur.
+					 * Slice new segments based on the indices of the gaps and add these to gaplessCoordSegments and gaplessCoordTimeSegments
+					 *
+					 */
 					gapIndicesPerSegment.forEach(function(segmentGapIndices, ii) {
 						if(segmentGapIndices.length === 0) {
 							gaplessCoordSegments.push(coords[ii]);
@@ -315,12 +326,18 @@ angular.module('wigs')
 					}
 				};
 
+				if(trackId === 'track0') map.flyTo({center: pointInitialCoordinates});
 				map.addLayer(line);
 				map.addLayer(point);
 
 				$scope.$apply();
 
 				return vm.lookup.tracks;
+			}
+
+			function recenterMap(trackId) {
+				var center = vm.lookup.tracks[trackId].features[0].geometry.coordinates[0][0]
+				
 			}
 		}]
 	}

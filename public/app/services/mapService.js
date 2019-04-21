@@ -140,6 +140,7 @@ function() {
 			 * Third, loop through segments again and use the index bounds to create the filtered arrays of coordinates and coordTimes.
 			 * If a segment falls between the min and max, include all its coordinates.
 			 * If a segment is outside the range of the filter, assign an empty array to its position in the output.
+			 * If the maxCoordIndex is the last item in a segment, only slice from the min bound. This is because the end index on array.slice is non-inclusive.
 			 *
 			 */
 			for(var i = 0; i < coordTimes.length; i++) {

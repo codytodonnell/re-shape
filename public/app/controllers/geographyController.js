@@ -7,7 +7,7 @@ angular.module('wigs')
 	/**
 	 *
 	 * Initialize the Mapbox map
-	 * Center point determined using bboxfinder.com
+	 * Default center point in Atlanta
 	 * accessToken for Cody O'Donnell
 	 * Mapbox style by Cody O'Donnell
 	 *
