@@ -137,7 +137,7 @@ angular.module('wigs')
 			 *
 			 */
 			function addDistanceData(trackId) {
-				var data = [];
+				var lineData = [];
 				var track = vm.lookup.tracks[trackId];
 				var coords = track.features[0].geometry.coordinates;
 				var coordTimes = track.features[0].properties.coordTimes;
@@ -156,7 +156,7 @@ angular.module('wigs')
 							var line = turf.lineString(coords.slice(0, i));
 							distance = turf.length(line, {units: 'miles'});
 						}
-						data.push({
+						lineData.push({
 							date: new Date(coordTimes[i]),
 							distance: distance,
 							lat: c[1],
@@ -181,8 +181,11 @@ angular.module('wigs')
 					var gapIndicesPerSegment = [];
 					var gaplessCoordSegments = [];
 					var gaplessCoordTimeSegments = [];
+					var gaplessLineData = [];
+
 					coords.forEach(function(segment, ii) {
 						gapIndicesPerSegment[ii] = [];
+						lineData[ii] = [];
 						segment.forEach(function(c, i) {
 							var distance = 0;
 							if(i > 0) {
@@ -201,7 +204,7 @@ angular.module('wigs')
 							if(i == segment.length - 1) {
 								distanceAsOfSegment.push(distance);
 							}
-							data.push({
+							lineData[ii].push({
 								date: new Date(coordTimes[ii][i]),
 								distance: distance,
 								lat: c[1],
@@ -220,6 +223,7 @@ angular.module('wigs')
 						if(segmentGapIndices.length === 0) {
 							gaplessCoordSegments.push(coords[ii]);
 							gaplessCoordTimeSegments.push(coordTimes[ii]);
+							gaplessLineData.push(lineData[ii]);
 						} else {
 							segmentGapIndices.forEach(function(g, i) {
 								var newSegment;
@@ -227,19 +231,24 @@ angular.module('wigs')
 								if(i === 0) {
 									newSegment = coords[ii].slice(0, g);
 									newTimeSegment = coordTimes[ii].slice(0, g);
+									newLineSegment = lineData[ii].slice(0, g);
 								} else {
 									newSegment = coords[ii].slice(segmentGapIndices[i-1], g);
 									newTimeSegment = coordTimes[ii].slice(segmentGapIndices[i-1], g);
+									newLineSegment = lineData[ii].slice(segmentGapIndices[i-1], g);
 								}
 
 								gaplessCoordSegments.push(newSegment);
 								gaplessCoordTimeSegments.push(newTimeSegment);
+								gaplessLineData.push(newLineSegment);
 
 								if(i === segmentGapIndices.length - 1 && g < coords[ii].length - 1) {
 									restOfSegment = coords[ii].slice(g);
 									restOfTimeSegment = coordTimes[ii].slice(g);
+									restOfLineSegment = lineData[ii].slice(g);
 									gaplessCoordSegments.push(restOfSegment);
 									gaplessCoordTimeSegments.push(restOfTimeSegment);
+									gaplessLineData.push(restOfLineSegment);
 								} 
 							});
 						}
@@ -249,7 +258,7 @@ angular.module('wigs')
 					track.features[0].properties.coordTimes = gaplessCoordTimeSegments;
 				}
 
-				lineChartService.data.tracks.push(data);
+				lineChartService.data.tracks.push(gaplessLineData);
 				console.log("added a distance array");
 				return lineChartService.data;
 			}

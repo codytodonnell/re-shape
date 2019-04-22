@@ -3,6 +3,13 @@ angular.module('wigs')
 .factory('mapService', [
 function() {
 
+	/**
+	  *
+	  * Due to a piece of complexity with line chart path coloring,
+	  * there are also css classes for each of these colors to color path strokes.
+	  * Classes are called color0, color1, color2...
+	  *
+	  */
 	var colors = ["#66c2a5","#D31021","#ffd92f","#923FBF","#fc8d62","#885053","#b3b3b3","#a6d854"];
 	var lookup = {
 		tracks: {},
@@ -191,8 +198,8 @@ function() {
 			var track = lookup.tracks[key];
 			var trackData = track.features[0];
 			var number = key.split("track")[1];
-			var coordIndex,
-				coordLineIndex;
+			var coordIndex = null;
+			var coordLineIndex = null;
 			var data = {
 				"type": "Point",
 				"coordinates": []
@@ -209,7 +216,7 @@ function() {
 				}
 			} else if(trackData.geometry.type === 'MultiLineString') {
 				for(var i = 0; i < trackData.properties.coordTimes.length; i++) {
-					if(coordLineIndex === undefined) {
+					if(coordLineIndex === null) {
 						coordIndex = trackData.properties.coordTimes[i].findIndex(function(t) {
 							var coordTime = new Date(t);
 							return coordTime >= selectedTime;

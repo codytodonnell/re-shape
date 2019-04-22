@@ -161,9 +161,10 @@ function(mapService) {
 
 		var mergedData = [];
 
-		// Need to modify to support multi line strings
-		data.tracks.forEach(function(d) {
-			mergedData = mergedData.concat(d);
+		data.tracks.forEach(function(segment) {
+			segment.forEach(function(d) {
+				mergedData = mergedData.concat(d);
+			});
 		});
 
 		var miniBoundKey = ySelector.value === 'distance' ? ySelector.value : 'mini' + ySelector.value;
@@ -198,32 +199,40 @@ function(mapService) {
 		var series = chart.selectAll(".series")
 	        .data(data.tracks)
 	        .enter().append("g")
-	        .attr("class", "series");
+	        .attr("class", function(d, i) {
+	        	var color = i <= colors.length - 1 ? 'color' + i : 'color' + (i % colors.length);
+				return "series " + "track" + i + " " + color;
+			});
 
-		series.append("path")
-			  .attr("class", function(d, i) {
-			  	return "line " + "track" + i;
-			  })
-			  .attr("d", line)
-			  .style("stroke", function(d, i) {
-			  	var color = i <= colors.length - 1 ? colors[i] : colors[i % colors.length];
-			  	return color;
-			  });
+	    var segment = series.selectAll(".segment")
+	    	.data(function(d, i) {
+	    		return data.tracks[i];
+	    	})
+	    	.enter().append("g")
+	        .attr("class", "segment");
+
+		segment.append("path")
+			.attr("d", line)
+			.attr("class", "line");
 
 		var seriesMini = mini.selectAll(".series-mini")
 	        .data(data.tracks)
 	        .enter().append("g")
-	        .attr("class", "series-mini");
+	        .attr("class", function(d, i) {
+	        	var color = i <= colors.length - 1 ? 'color' + i : 'color' + (i % colors.length);
+				return "series-mini " + "track" + i + " " + color;
+			});
 
-		seriesMini.append("path")
-			  .attr("class", function(d, i) {
-			  	return "line " + "track" + i;
-			  })
-			  .attr("d", lineMini)
-			  .style("stroke", function(d, i) {
-			  	var color = i <= colors.length - 1 ? colors[i] : colors[i % colors.length];
-			  	return color;
-			  });
+	    var segmentMini = seriesMini.selectAll(".segment-mini")
+	    	.data(function(d, i) {
+	    		return data.tracks[i];
+	    	})
+	    	.enter().append("g")
+	        .attr("class", "segment-mini");
+
+		segmentMini.append("path")
+			.attr("d", lineMini)
+			.attr("class", "line");
 
 		mapService.drawFilteredTrack(xScale.domain()[0], xScale.domain()[1]);
 	}

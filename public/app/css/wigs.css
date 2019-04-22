@@ -154,18 +154,34 @@
 	line-height: 40px;
 }
 
-/*.full-screen-modal > .bg {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	background: #2892D7;
-	opacity: 0.9;
-	z-index: 0;
+.color0 path {
+	stroke: #66c2a5;
 }
 
-.full-screen-modal > .fg {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	z-index: 1
-}*/
+.color1 path {
+	stroke: #D31021;
+}
+
+.color2 path {
+	stroke: #ffd92f;
+}
+
+.color3 path {
+	stroke: #923FBF;
+}
+
+.color4 path {
+	stroke: #fc8d62;
+}
+
+.color5 path {
+	stroke: #885053;
+}
+
+.color6 path {
+	stroke: #b3b3b3;
+}
+
+.color7 path {
+	stroke: #a6d854;
+}
