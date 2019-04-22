@@ -42,8 +42,6 @@ angular.module('wigs')
 
 	vm.lookup = mapService.lookup;
 
-	vm.tracksLoaded = false;
-
 	vm.anyVisible = false;
 
 	map.on('load', rescaleFromMapBounds);

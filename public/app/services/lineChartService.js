@@ -16,9 +16,10 @@ function(mapService) {
 	//     height = fullHeight - margin.top - margin.bottom,
 	//     heightMini = fullHeight - marginMini.top - marginMini.bottom;
 
-	var margin = {top: fullHeight*0.12, right: 50, bottom: fullHeight*0.04, left: 25},
-		marginMini = {top: fullHeight*0.005, right: 50, bottom: fullHeight*0.9, left: 25},
+	var margin = {top: fullHeight*0.12, right: 0, bottom: 0, left: 0},
+		marginMini = {top: fullHeight*0.005, right: 25, bottom: fullHeight*0.9, left: 25},
 	    width = fullWidth - margin.left - margin.right,
+	    widthMini = fullWidth - marginMini.left - marginMini.right;
 	    height = fullHeight - margin.top - margin.bottom,
 	    heightMini = fullHeight - marginMini.top - marginMini.bottom;
 
@@ -42,15 +43,15 @@ function(mapService) {
 
 	// set the mini chart scales
 	var xScaleMini = d3.scaleTime()
-		.range([0, width])
+		.range([0, widthMini])
 		.domain([new Date(), new Date()]);
 
 	var yScaleMini = d3.scaleLinear()
 		.range([heightMini, 0])
 		.domain([0, 100]);
 
-	var xAxis = d3.axisBottom(xScale),
-		xAxisMini = d3.axisBottom(xScaleMini),
+	var xAxis = d3.axisBottom(xScale).ticks(5).tickFormat(d3.timeFormat("%m/%d %I%p")),
+		xAxisMini = d3.axisBottom(xScaleMini).ticks(5).tickFormat(d3.timeFormat("%m/%d %I%p")),
 		yAxis = d3.axisLeft(yScale);
 
 	var min = {
@@ -78,7 +79,7 @@ function(mapService) {
 	    .y(function(d) { return yScaleMini(d[ySelector.value]); });
 
 	var brush = d3.brushX()
-	    .extent([[0, 0], [width, heightMini]])
+	    .extent([[0, 0], [widthMini, heightMini]])
 	    .on("brush end", brushed);
 
 	var zoom = d3.zoom()
@@ -126,8 +127,11 @@ function(mapService) {
 	  	.attr("class", "y axis")
 	  	.call(yAxis);
 
+	positionTicks();
+
 	var mini = svg.append("g")
 	    .attr("class", "mini")
+	    .attr("width", widthMini)
 	    .attr("transform", "translate(" + marginMini.left + "," + marginMini.top + ")");
 
 	mini.append("g")
@@ -137,8 +141,9 @@ function(mapService) {
 
   	mini.append("g")
       	.attr("class", "brush")
+      	.attr("width", widthMini)
       	.call(brush)
-      	.call(brush.move, xScale.range());
+      	.call(brush.move, xScaleMini.range());
 
     var mouseBox = svg.append("rect")
 		.attr("class", "zoom")
@@ -191,6 +196,8 @@ function(mapService) {
 		focus.select('.y.axis')
 			.transition()
 			.call(yAxis);
+
+		positionTicks();
 
 		mini.select('.x.axis')
 			.transition()
@@ -256,6 +263,7 @@ function(mapService) {
 		chart.selectAll(".line").attr("d", line);
 		focus.select(".axis.x").call(xAxis);
 		mini.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
+		positionTicks();
 		mapService.drawFilteredTrack(xScale.domain()[0], xScale.domain()[1]);
 	}
 
@@ -314,6 +322,8 @@ function(mapService) {
 			.transition()
 			.call(xAxisMini);
 
+		positionTicks();
+
 		d3.selectAll('.series path')
 			.transition()
 			.duration(750)
@@ -340,6 +350,8 @@ function(mapService) {
 				.transition()
 				.call(yAxis);
 
+			positionTicks();
+
 			d3.selectAll('.series path')
 				.transition()
 				.duration(750)
@@ -358,6 +370,26 @@ function(mapService) {
 	function clearChart() {
 		d3.selectAll('.series, .series-mini').remove();
 		data.tracks = [];
+	}
+
+	function positionTicks() {
+		d3.selectAll(".focus .x .tick text")
+			.transition()
+	    	.attr("y", -20);
+
+	   	d3.selectAll(".focus .x .tick line")
+			.transition()
+	    	.attr("y2", -10);
+
+		d3.selectAll(".focus .y .tick text")
+			.transition()
+	    	.attr("dy", "-0.7em")
+	    	.attr("x", 2)
+	    	.style("text-anchor", "start");
+
+	   	d3.selectAll(".focus .y .tick line")
+			.transition()
+	    	.attr("x2", 30);
 	}
 
 	return {
