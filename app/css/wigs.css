@@ -1,0 +1,236 @@
+.header {
+	margin-top: 10px;
+}
+
+#geo-container {
+	max-height: 100vh;
+	overflow: hidden;
+}
+
+.controls {
+	height: 12.5vh;
+}
+
+#map {
+	height: 87.5vh;
+	width: 100%;
+	display: inline-block;
+	background: #000;
+}
+
+#line-container {
+	height: 100vh;
+}
+
+.btn-dynamic-color {
+    color: #000 !important;
+    border-color: #ccc !important;
+}
+
+.dynamic-button-row {
+	overflow-x: hidden;
+	margin-left: 50px;
+}
+
+.dynamic-button-row:hover {
+	overflow-x: auto;
+}
+
+.dynamic-button-row > *:not(:first-child) {
+	margin-left: 5px;
+}
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+
+.link:hover {
+  stroke-opacity: .5;
+}
+
+.ticks {
+  font-size: 10px;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #dcdcdc;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  stroke: transparent;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.axis {
+	opacity: 0.3;
+}
+
+.focus .y.axis path {
+	opacity: 0;
+}
+
+.y.axis .tick:first-of-type, .y.axis .tick:last-of-type {
+	opacity: 0;
+}
+
+.zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}
+
+.tooltip {
+	position: absolute;
+	background: #efefef;
+	border: 1px solid #ccc;
+}
+
+.full-screen-modal {
+	position: absolute;
+	width: 100%;
+	height: 0;
+	opacity: 0;
+	z-index: 3;
+	text-align: center;
+	background: #fff;
+	overflow: hidden;
+	transition: 0.5s;
+}
+
+.full-screen-modal.show-fsm {
+	height: 100%;
+	opacity: 0.9;
+}
+
+.full-screen-modal p {
+	max-width: 700px;
+	margin: auto;
+	margin-bottom: 20px;
+}
+
+.title {
+	font-size: 4em;
+}
+
+.medium-font {
+	font-size: 1.2em;
+}
+
+.btn-upload {
+	background: salmon;
+	font-size: 1.5em;
+	width: 250px;
+	color: #fff;
+	transition: 0.5s;
+}
+
+.btn-upload[disabled] {
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.btn-upload:hover:not(:disabled) {
+	color: #ccc;
+}
+
+.modal-btn {
+	position: fixed;
+	top: 0.5rem;
+	left: 15px;
+	z-index: 4;
+    border-radius: 25px;
+    border: solid 1px #ccc;
+    height: 38px;
+    width: 38px;
+    text-align: center;
+    transition: 0.5s;
+}
+
+.modal-btn.modal-btn-up {
+	transform: rotate(180deg);
+	background: #fff;
+	color: #2892D7;
+}
+
+.modal-btn.modal-btn-down {
+	transform: rotate(0deg);
+	background: #2892D7;
+	color: #fff;
+}
+
+.modal-btn > i {
+	line-height: 38px;
+}
+
+/*.color0 path {
+	stroke: #66c2a5;
+}
+
+.color1 path {
+	stroke: #D31021;
+}
+
+.color2 path {
+	stroke: #ffd92f;
+}
+
+.color3 path {
+	stroke: #923FBF;
+}
+
+.color4 path {
+	stroke: #fc8d62;
+}
+
+.color5 path {
+	stroke: #885053;
+}
+
+.color6 path {
+	stroke: #b3b3b3;
+}
+
+.color7 path {
+	stroke: #a6d854;
+}*/

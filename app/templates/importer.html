@@ -1,0 +1,8 @@
+<aside class="col-md-8 offset-md-2 mt-5">
+	<h1 class="mb-2 title">ReshapeWeb</h1>
+	<p class="mb-5 medium-font">Visualize your movement. Reflect on your data.</p>
+	<p>To get started, upload one or more GPX, CSV, or JSON files with timestamped geographic coordinates. Check out the sample data if you haven't collected any data of your own yet.</p>
+	<button class="btn btn-upload" ngf-select="im.upload($files)" multiple="multiple" ng-disabled="im.loading">Upload Data</button>
+	<p ng-if="im.loading"><i class="fas fa-cog fa-spin"></i> Processing {{im.numTracksToLoad}} files</p>
+	<button class="btn btn-upload" ng-click="im.loadSample()">Load Sample Data</button>
+</aside>
