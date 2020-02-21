@@ -105,7 +105,7 @@ angular.module('wigs')
 					}, function(err, data) {
 						geojson = csv2geojson.toLine(data);
 						geojson.features[0].properties.coordTimes = geojson.features[0].properties.time.map(function(d) {
-							return d + 'Z';
+							return d;
 						});
 						delete geojson.features[0].properties.time;
 					});
@@ -153,7 +153,7 @@ angular.module('wigs')
 				var track = vm.lookup.tracks[trackId];
 				var coords = track.features[0].geometry.coordinates;
 				var coordTimes = track.features[0].properties.coordTimes;
-				var parseTime = d3.timeParse('%m/%d/%y %H:%M%Z');
+				var parseTime = d3.timeParse('%m/%d/%y %H:%M');
 				
 				/**
 				 *
@@ -164,11 +164,11 @@ angular.module('wigs')
 				 */
 				if(track.features[0].geometry.type === 'LineString') {
 					coords.forEach(function(c, i) {
-						var distance = 0;
-						if(i > 1) {
-							var line = turf.lineString(coords.slice(0, i));
-							distance = turf.length(line, {units: 'miles'});
-						}
+						// var distance = 0;
+						// if(i > 1) {
+						// 	var line = turf.lineString(coords.slice(0, i));
+						// 	distance = turf.length(line, {units: 'miles'});
+						// }
 						lineData.push({
 							date: parseTime(coordTimes[i]),
 							distance: distance,
@@ -202,24 +202,14 @@ angular.module('wigs')
 						segment.forEach(function(c, i) {
 							var distance = 0;
 							if(i > 0) {
-								var line = turf.lineString(segment.slice(0, i+1));
-								distance = turf.length(line, {units: 'miles'});
-								var pointToPreviousPoint = turf.lineString(segment.slice(i-1, i+1));
-								distanceFromPrevious = turf.length(pointToPreviousPoint, {units: 'miles'});
-								if(distanceFromPrevious > 1.0) {
+								var timeGap = parseTime(coordTimes[ii][i]) - parseTime(coordTimes[ii][i-1]);
+								if(timeGap > 300000) {
 									gapIndicesPerSegment[ii].push(i);
-									distance = 0;
 								}
-							}
-							if(ii > 0) {
-								distance = distance + distanceAsOfSegment[ii - 1];
-							}
-							if(i == segment.length - 1) {
-								distanceAsOfSegment.push(distance);
 							}
 							lineData[ii].push({
 								date: parseTime(coordTimes[ii][i]),
-								distance: distance,
+								// distance: distance,
 								lat: c[1],
 								long: c[0]
 							});

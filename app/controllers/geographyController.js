@@ -168,7 +168,6 @@ angular.module('wigs')
 		lineChartService.rescaleYAxis(bounds);
 		vm.lookup = mapService.getLookup();
 		$scope.$apply();
-		console.log(vm.lookup);
 	}
 }]);
 

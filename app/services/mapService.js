@@ -151,7 +151,7 @@ function() {
 			 * In this situation, the max coordinate should be the last coordinate in the data.
 			 *
 			 */
-			var parseTime = d3.timeParse('%m/%d/%y %H:%M%Z');
+			var parseTime = d3.timeParse('%m/%d/%y %H:%M');
 			for(var i = 0; i < coordTimes.length; i++) {
 				if(minLineIndex === undefined) {
 					minCoordIndex = coordTimes[i].findIndex(function(t) {
