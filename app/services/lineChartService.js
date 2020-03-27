@@ -80,7 +80,7 @@ function(mapService) {
 
 	var brush = d3.brushX()
 	    .extent([[0, 0], [widthMini, heightMini]])
-	    .on("brush end", brushed);
+	    .on("end", brushed);
 
 	var zoom = d3.zoom()
 	    .scaleExtent([1, Infinity])

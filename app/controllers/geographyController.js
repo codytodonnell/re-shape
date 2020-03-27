@@ -46,9 +46,9 @@ angular.module('wigs')
 
 	map.on('load', rescaleFromMapBounds);
 
-	map.on('zoom', rescaleFromMapBounds);
+	map.on('zoomend', rescaleFromMapBounds);
 
-	map.on('drag', rescaleFromMapBounds);
+	map.on('dragend', rescaleFromMapBounds);
 
 	vm.makeData = jsonService.addGeorgiaPopulationFields;
 

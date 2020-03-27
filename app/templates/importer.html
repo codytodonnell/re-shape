@@ -1,8 +1,26 @@
 <aside class="col-md-8 offset-md-2 mt-5">
-	<h1 class="mb-2 title">ReshapeWeb</h1>
-	<p class="mb-5 medium-font">Visualize your movement. Reflect on your data.</p>
-	<p>To get started, upload one or more GPX, CSV, or JSON files with timestamped geographic coordinates. Check out the sample data if you haven't collected any data of your own yet.</p>
-	<button class="btn btn-upload" ngf-select="im.upload($files)" multiple="multiple" ng-disabled="im.loading">Upload Data</button>
-	<p ng-if="im.loading"><i class="fas fa-cog fa-spin"></i> Processing {{im.numTracksToLoad}} files</p>
-	<button class="btn btn-upload" ng-click="im.loadSample()">Load Sample Data</button>
+	<header>
+		<h1 class="mb-2 title">IGS Re-Shape</h1>
+		<p class="mb-4 medium-font">Collaboratively and dynamically visualize your physical movement data over space and time.</p>
+	</header>
+	<article>
+		<div class="info-block">
+			<h2>Collect your movement data</h2>
+			<p>Collect data on your physical movement across space and time. <a href="https://www.benrydal.com/re-shape#block-4a1b664da35b268c1043">Visit the Re-Shape page to learn more about how to collect and process your movement data. <i class="fas fa-arrow-right"></i></a></p>
+		</div>
+		<div class="info-block">
+			<h2>Visualize your data</h2>
+			<p>Select one or more GPX, CSV, or JSON files with timestamped geographic coordinates of your movement to upload and visualize.</p>
+			<button class="btn btn-upload" ngf-select="im.upload($files)" multiple="multiple" ng-disabled="im.loading"><i class="fas fa-upload"></i> Select files to visualize</button>
+		</div>
+		<div class="info-block">
+			<h2>Check out the sample</h2>
+			<p>This sample shows 8 pre-service teachers’ physical movement across Nashville, TN. The left view shows each teachers’ movement over a map while the right view extends their movement over over a timeline (approximately 1 week) where the vertical axis corresponds to the vertical dimension on the map.</p>
+			<button class="btn btn-upload" ng-click="im.loadSample()"><i class="fas fa-route"></i> Load sample data</button>
+		</div>
+		<p ng-if="im.loading"><i class="fas fa-cog fa-spin"></i> Processing {{im.numTracksToLoad}} files</p>
+	</article>
+	<footer>
+		<p>This tool supports an approach to teaching data ethics for data science education called <a href="https://www.benrydal.com/re-shape" target="_blank">Re-Shape</a>. This work was supported by the National Science Foundation, Vanderbilt University, and the Kendeda Living Building Challenge at the Georgia Institute of Technology.</p>
+	</footer>
 </aside>
