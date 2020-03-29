@@ -40,11 +40,20 @@ angular.module('wigs')
 			}
 
 			vm.loadSample = function() {
-				d3.json("app/data/sample.json").then(function(data) {
-					vm.numTracksToLoad = 2;
-					vm.lookup = data;
-					vm.trackButtonList = Object.keys(data.tracks).map(function(d, i) { return d; });
-					mapService.setLookup(data);
+				Promise.all([
+				    d3.csv('data/sample/1.csv'),
+				    d3.csv('data/sample/2.csv'),
+				    d3.csv('data/sample/3.csv'),
+				    d3.csv('data/sample/4.csv')
+				]).then(function(data) {
+					mapService.clearMap();
+					lineChartService.clearChart();
+					vm.numTracksToLoad = data.length;
+					data.forEach(function(d) {
+						vm.lookup.tracks["track" + vm.lookup.number++] = convertToGeoJSON(d, 'csv');
+					});
+					vm.trackButtonList = Object.keys(vm.lookup.tracks).map(function(d, i) { return d; });
+					mapService.setLookup(vm.lookup);
 					processGeojson();
 					lineChartService.render();
 				});	
@@ -153,7 +162,7 @@ angular.module('wigs')
 				var track = vm.lookup.tracks[trackId];
 				var coords = track.features[0].geometry.coordinates;
 				var coordTimes = track.features[0].properties.coordTimes;
-				var parseTime = d3.timeParse('%m/%d/%y %H:%M');
+				var parseTime = coordTimes[0][0].indexOf('Z') > -1 ? d3.timeParse('%Y-%m-%dT%H:%M:%S%Z') : d3.timeParse('%m/%d/%y %H:%M');
 				
 				/**
 				 *

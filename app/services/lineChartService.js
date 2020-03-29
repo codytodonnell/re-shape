@@ -16,8 +16,8 @@ function(mapService) {
 	//     height = fullHeight - margin.top - margin.bottom,
 	//     heightMini = fullHeight - marginMini.top - marginMini.bottom;
 
-	var margin = {top: fullHeight*0.12, right: 0, bottom: 0, left: 0},
-		marginMini = {top: fullHeight*0.005, right: 25, bottom: fullHeight*0.9, left: 25},
+	var margin = {top: fullHeight*0.12, right: 25, bottom: 0, left: 10},
+		marginMini = {top: fullHeight*0.005, right: 25, bottom: fullHeight*0.9, left: 10},
 	    width = fullWidth - margin.left - margin.right,
 	    widthMini = fullWidth - marginMini.left - marginMini.right;
 	    height = fullHeight - margin.top - margin.bottom,
@@ -400,7 +400,7 @@ function(mapService) {
 
 	   	d3.selectAll(".focus .y .tick line")
 			.transition()
-	    	.attr("x2", 30);
+	    	.attr("x2", 10);
 	}
 
 	return {

@@ -24,17 +24,17 @@ function() {
 	var colors = [
 		"#9467bd",
 		"#ff7f0e",
+		"#2ca02c",
+		"#d62728",
+		"#e377c2",
+		"#15bece",
+		"#1f77b4",
 		"#c5b0d5",
 		"#ffbb77",
-		"#2ca02c",
 		"#98df8a",
-		"#d62728",
 		"#ff9896",
-		"#e377c2",
 		"#f8b6d2",
-		"#15bece",
 		"#9ddae4",
-		"#1f77b4",
 		"#aec7e8"
 	];
 	var lookup = {
@@ -151,7 +151,8 @@ function() {
 			 * In this situation, the max coordinate should be the last coordinate in the data.
 			 *
 			 */
-			var parseTime = d3.timeParse('%m/%d/%y %H:%M');
+			// var parseTime = d3.timeParse('%m/%d/%y %H:%M');
+			var parseTime = coordTimes[0][0].indexOf('Z') > -1 ? d3.timeParse('%Y-%m-%dT%H:%M:%S%Z') : d3.timeParse('%m/%d/%y %H:%M');
 			for(var i = 0; i < coordTimes.length; i++) {
 				if(minLineIndex === undefined) {
 					minCoordIndex = coordTimes[i].findIndex(function(t) {
